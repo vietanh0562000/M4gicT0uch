@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, Enum, Vec3 } from 'cc';
+import { _decorator, Component, Node, Enum, Vec3, SpriteFrame, Sprite, ParticleSystem2D } from 'cc';
 import { Common } from './Common';
 import { Constants } from './Constants';
 const { ccclass, property } = _decorator;
@@ -41,9 +41,37 @@ export class CardController extends Component {
         return this.nameCard;
     }
 
-    // TODO: show paricle when destroy. after that hide card and add card to pool object
+    // TODO: show particle when destroy. after that hide card and add card to pool object
     public destroyCard(){
-        this.node.active = false;
+        console.log(this.nameCard + "*");
+        // * Active explode effect
+        let explodeParticle = this.node.getChildByName("Explode");
+        explodeParticle.active = true;
+
+        // * Hide card sprite before actually hide it
+        let originSprite = this.node.getComponent(Sprite).spriteFrame;
+        this.node.getComponent(Sprite).spriteFrame = null;
+
+        // * Waiting amount of time to hide card actually
+        console.log(explodeParticle.getComponent(ParticleSystem2D).duration * 1000);
+        setTimeout(() => {
+            this.node.getComponent(Sprite).spriteFrame = originSprite;
+            this.node.active = false;
+        }, explodeParticle.getComponent(ParticleSystem2D).duration * 1000);
+    }
+
+    /**
+     * * Init new card
+     * @param spriteFrame 
+     * @param nameCard 
+     * @param point 
+     * @param cardProp 
+     */
+    public init(spriteFrame: SpriteFrame, nameCard: string,  point: number, cardProp: number){
+        this.getComponent(Sprite).spriteFrame = spriteFrame;
+        this.nameCard = nameCard;
+        this.point = point;
+        this.cardProp = cardProp;
     }
 }
 
